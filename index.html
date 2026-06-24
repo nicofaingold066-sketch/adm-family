@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADM Familia</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:14px}
+.topbar{background:#1a1a2e;color:#fff;padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.topbar h1{font-size:18px;font-weight:600;letter-spacing:1px}
+.topbar .version{font-size:11px;opacity:.5}
+.month-nav{background:#fff;border-bottom:1px solid #e0e0e0;padding:12px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.month-nav button{background:#1a1a2e;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+.month-nav button:hover{background:#2d2d50}
+.month-label{font-size:20px;font-weight:700;min-width:180px;text-align:center}
+.alert-bar{background:#fff3cd;border-left:4px solid #ffc107;padding:10px 24px;font-size:13px;display:none}
+.alert-bar.danger{background:#fde8e8;border-color:#e74c3c}
+.alert-bar.success{background:#d4edda;border-color:#28a745}
+.rates-bar{background:#fff;border-bottom:1px solid #e0e0e0;padding:10px 24px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.rate-pill{display:flex;align-items:center;gap:8px;background:#f8f9fa;border-radius:8px;padding:8px 14px}
+.rate-pill .lbl{font-size:11px;color:#666;font-weight:600;text-transform:uppercase}
+.rate-pill .val{font-size:16px;font-weight:700}
+.rate-pill .val.blue{color:#185FA5}
+.rate-pill .val.oficial{color:#0F6E56}
+.rate-pill .val.mep{color:#854F0B}
+.rate-pill input{font-size:16px;font-weight:700;width:110px;border:none;background:transparent;outline:none}
+.btn-refresh{background:#185FA5;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:6px}
+.btn-refresh:hover{background:#0c447c}
+.last-update{font-size:11px;color:#999;margin-left:auto}
+.main{display:grid;grid-template-columns:1fr 340px;gap:0;min-height:calc(100vh - 160px)}
+.left-panel{padding:20px 24px;border-right:1px solid #e0e0e0;background:#fff}
+.right-panel{padding:20px 16px;background:#f8f9fa}
+.panel-title{font-size:13px;font-weight:700;text-transform:uppercase;color:#666;letter-spacing:.5px;margin-bottom:14px;border-bottom:2px solid #1a1a2e;padding-bottom:6px}
+.cat-block{margin-bottom:16px;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden}
+.cat-header{background:#f8f9fa;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid #e8e8e8}
+.cat-header:hover{background:#f0f0f0}
+.cat-header .cat-name{font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px}
+.cat-header .cat-total{font-weight:700;font-size:14px}
+.cat-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.cat-body{padding:8px 14px 12px}
+.item-row{display:grid;grid-template-columns:1fr 140px 30px;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0}
+.item-row:last-child{border-bottom:none}
+.item-row input[type=text]{border:none;background:transparent;font-size:13px;color:#333;width:100%;outline:none}
+.item-row input[type=text]:focus{background:#f0f7ff;border-radius:4px;padding:2px 4px}
+.item-row input[type=number]{border:1px solid #ddd;border-radius:4px;padding:4px 8px;font-size:13px;text-align:right;width:100%;background:#fff}
+.item-row input[type=number]:focus{outline:none;border-color:#185FA5}
+.btn-del{background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;line-height:1}
+.btn-del:hover{color:#e74c3c}
+.btn-add{background:none;border:1px dashed #ccc;color:#999;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:12px;margin-top:6px;width:100%}
+.btn-add:hover{border-color:#185FA5;color:#185FA5;background:#f0f7ff}
+.summary-card{background:#fff;border-radius:10px;padding:14px;margin-bottom:14px;border:1px solid #e8e8e8}
+.summary-card .big-num{font-size:24px;font-weight:800;margin:4px 0}
+.summary-card .sub{font-size:12px;color:#666}
+.usd-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
+.usd-row:last-child{border-bottom:none}
+.usd-row .usd-lbl{color:#666;font-size:11px;font-weight:600}
+.usd-row .usd-val{font-weight:700}
+.stat-card{background:#fff;border-radius:10px;padding:14px;margin-bottom:14px;border:1px solid #e8e8e8}
+.stat-card h4{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700}
+.badge.up{background:#fde8e8;color:#c0392b}
+.badge.down{background:#d4edda;color:#155724}
+.badge.same{background:#f0f0f0;color:#666}
+.chart-wrap{background:#fff;border-radius:10px;padding:14px;border:1px solid #e8e8e8}
+.chart-wrap h4{font-size:12px;color:#666;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.footer-bar{background:#fff;border-top:1px solid #e0e0e0;padding:10px 24px;display:flex;gap:10px;align-items:center}
+.btn-action{background:#f8f9fa;border:1px solid #ddd;border-radius:6px;padding:7px 16px;cursor:pointer;font-size:12px;color:#333}
+.btn-action:hover{background:#e8e8e8}
+.btn-action.primary{background:#1a1a2e;color:#fff;border-color:#1a1a2e}
+.btn-action.primary:hover{background:#2d2d50}
+.status-bar{font-size:11px;color:#999;margin-left:auto}
+@media(max-width:900px){.main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>&#9679; ADM FAMILIA</h1>
+  <span class="version">v2.0 — 2026</span>
+</div>
+
+<div class="month-nav">
+  <button onclick="changeMonth(-1)">&#8592; Anterior</button>
+  <div class="month-label" id="monthLabel"></div>
+  <button onclick="changeMonth(1)">Siguiente &#8594;</button>
+</div>
+
+<div class="alert-bar" id="alertBar"></div>
+
+<div class="rates-bar">
+  <div class="rate-pill">
+    <span class="lbl">Blue</span>
+    <input type="number" id="rBlue" class="val blue" placeholder="—" oninput="onRateChange()">
+  </div>
+  <div class="rate-pill">
+    <span class="lbl">Oficial</span>
+    <input type="number" id="rOficial" class="val oficial" placeholder="—" oninput="onRateChange()">
+  </div>
+  <div class="rate-pill">
+    <span class="lbl">MEP</span>
+    <input type="number" id="rMep" class="val mep" placeholder="—" oninput="onRateChange()">
+  </div>
+  <button class="btn-refresh" onclick="fetchRates()">&#8635; Actualizar dólar</button>
+  <span class="last-update" id="lastUpdate"></span>
+</div>
+
+<div class="main">
+  <div class="left-panel">
+    <div class="panel-title">Gastos del mes</div>
+    <div id="expensesContainer"></div>
+  </div>
+  <div class="right-panel">
+    <div class="panel-title">Resumen</div>
+    <div class="summary-card">
+      <div class="sub">Total del mes en pesos</div>
+      <div class="big-num" id="totalARS">$0</div>
+      <div style="margin-top:10px">
+        <div class="usd-row"><span class="usd-lbl">Blue</span><span class="usd-val blue" id="totBlue" style="color:#185FA5">—</span></div>
+        <div class="usd-row"><span class="usd-lbl">Oficial</span><span class="usd-val" id="totOficial" style="color:#0F6E56">—</span></div>
+        <div class="usd-row"><span class="usd-lbl">MEP</span><span class="usd-val" id="totMep" style="color:#854F0B">—</span></div>
+      </div>
+    </div>
+    <div class="stat-card" id="compSection" style="display:none">
+      <h4>vs Mes anterior</h4>
+      <div id="compContent"></div>
+    </div>
+    <div class="chart-wrap">
+      <h4>Por categoría</h4>
+      <div style="position:relative;height:260px"><canvas id="catChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer-bar">
+  <button class="btn-action primary" onclick="exportData()">&#8595; Exportar datos (JSON)</button>
+  <button class="btn-action" onclick="document.getElementById('importFile').click()">&#8593; Importar datos</button>
+  <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+  <button class="btn-action" onclick="window.print()">&#128438; Imprimir mes</button>
+  <span class="status-bar" id="statusBar">Datos guardados localmente</span>
+</div>
+
+<script>
+const CATS = [
+  {key:'telefonia', name:'Telefonía / Internet', color:'#185FA5', defaults:['Personal + Flow']},
+  {key:'salud', name:'Salud', color:'#993556', defaults:['Galeno']},
+  {key:'servicios', name:'Servicios', color:'#0F6E56', defaults:['Ecogas','Edemsa (Rincón)','Edenor (JH)','Aysam (Rincón)']},
+  {key:'vivienda', name:'Vivienda / Expensas', color:'#534AB7', defaults:['Expensas Rincón']},
+  {key:'seguros', name:'Seguros', color:'#854F0B', defaults:['Seguro Hilux','Seguro RAV4','Seguro Zanella']},
+  {key:'personal', name:'Personal doméstico', color:'#5F5E5A', defaults:['Contador','Jardinero']},
+  {key:'educacion', name:'Educación', color:'#3B6D11', defaults:['San Nicolás (Espi)','Colegio Espi']},
+  {key:'cuotas', name:'Planes / Cuotas', color:'#993C1D', defaults:['Plan Hilux']},
+  {key:'impuestos', name:'Impuestos', color:'#A32D2D', defaults:['AFIP']},
+];
+
+const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+const PRELOADED = {
+  '2025-12':{
+    telefonia:[{n:'Personal',a:472597.64},{n:'Flow',a:76632.26}],
+    salud:[{n:'Galeno',a:869692.93}],
+    servicios:[{n:'Ecogas',a:127414.54},{n:'Edemsa (Rincón)',a:194890.50},{n:'Edenor (JH)',a:26355},{n:'Aysam (Rincón)',a:1331708.26}],
+    vivienda:[{n:'Expensas Rincón',a:564084.15}],
+    seguros:[],personal:[],educacion:[{n:'Facu Nico',a:117000}],cuotas:[],impuestos:[]
+  },
+  '2026-01':{
+    telefonia:[{n:'Personal',a:338849.20},{n:'Flow',a:78104.29}],
+    salud:[{n:'Galeno',a:891435.25}],
+    servicios:[{n:'Ecogas',a:113718.19},{n:'Edemsa (Rincón)',a:285070.50},{n:'Edenor (JH)',a:16712.17},{n:'Aysam (Rincón)',a:742850.86}],
+    vivienda:[{n:'Expensas Rincón',a:600171.15}],
+    seguros:[{n:'Seguro SW4',a:250000},{n:'Seguro Hilux',a:90000},{n:'Seguro RAV4',a:180000}],
+    personal:[{n:'Jardinero',a:270000}],educacion:[],cuotas:[],impuestos:[]
+  },
+  '2026-02':{
+    telefonia:[{n:'Personal',a:263334.18},{n:'Flow',a:82299.99}],
+    salud:[{n:'Galeno',a:916395.44}],
+    servicios:[{n:'Ecogas',a:86379.34},{n:'Edemsa (Rincón)',a:285070.52},{n:'Edenor (JH)',a:231.01},{n:'Aysam (Rincón)',a:76996}],
+    vivienda:[{n:'Expensas Rincón',a:631552.15}],
+    seguros:[{n:'Seguro Hilux',a:102600},{n:'Seguro SW4',a:280000},{n:'Seguro RAV4',a:230000}],
+    personal:[{n:'Jardinero',a:120000}],educacion:[],cuotas:[],impuestos:[]
+  },
+  '2026-03':{
+    telefonia:[{n:'Personal + Flow',a:84888.57}],
+    salud:[{n:'Galeno',a:942970.94}],
+    servicios:[{n:'Ecogas',a:83349.91},{n:'Edemsa (Rincón)',a:307827.50},{n:'Edenor (JH)',a:19376.36},{n:'Aysam (Rincón)',a:77000}],
+    vivienda:[{n:'Expensas Rincón',a:646938.15}],
+    seguros:[{n:'Seguro Hilux',a:102000},{n:'Seguro SW4',a:280000},{n:'Seguro RAV4',a:230000}],
+    personal:[{n:'Contador',a:390000},{n:'Jardinero',a:120000}],
+    educacion:[{n:'Colegio Espi',a:1797000}],
+    cuotas:[{n:'ATM SW4',a:433144.49}],impuestos:[]
+  },
+  '2026-04':{
+    telefonia:[{n:'Personal',a:215597.57},{n:'Flow',a:87789}],
+    salud:[{n:'Galeno',a:970317.08}],
+    servicios:[{n:'Ecogas',a:52965.18},{n:'Edemsa (Rincón)',a:307827.50},{n:'Aysam (Rincón)',a:128982.34}],
+    vivienda:[{n:'Expensas Rincón',a:647138.15}],
+    seguros:[{n:'Seguro Hilux',a:120000}],
+    personal:[{n:'Contador',a:390000},{n:'Jardinero',a:140000}],
+    educacion:[],cuotas:[],impuestos:[]
+  },
+  '2026-05':{
+    telefonia:[{n:'Personal + Flow',a:106720}],
+    salud:[{n:'Galeno',a:1002989.19}],
+    servicios:[{n:'Ecogas',a:52699.22},{n:'Edemsa (Rincón)',a:210000},{n:'Aysam (Rincón)',a:52000}],
+    vivienda:[{n:'Expensas Rincón',a:647138.15}],
+    seguros:[{n:'Seguro Hilux',a:120000},{n:'Seguro RAV4',a:230000},{n:'Seguro Zanella',a:16900}],
+    personal:[{n:'Contador',a:140000},{n:'Jardinero',a:120000}],
+    educacion:[],cuotas:[],impuestos:[]
+  },
+  '2026-06':{
+    telefonia:[{n:'Personal + Flow',a:608011.74}],
+    salud:[{n:'Galeno',a:1027402.75}],
+    servicios:[{n:'Ecogas',a:216596.31},{n:'Edemsa (Rincón)',a:219441.50},{n:'Aysam (Rincón)',a:69916.18}],
+    vivienda:[{n:'Expensas Rincón',a:647158.15}],
+    seguros:[{n:'Seguros (flota)',a:374648}],
+    personal:[{n:'Contador',a:140000},{n:'Jardinero',a:120000}],
+    educacion:[{n:'San Nicolás (Espi)',a:485000}],
+    cuotas:[{n:'Plan SW4',a:347806.87},{n:'Plan Hilux',a:258660.42}],
+    impuestos:[{n:'AFIP',a:2970000}]
+  }
+};
+
+let cy = new Date().getFullYear(), cm = new Date().getMonth();
+let allData = JSON.parse(localStorage.getItem('adm_familia_v2') || '{}');
+let chartInst = null;
+
+Object.keys(PRELOADED).forEach(k => { if (!allData[k]) allData[k] = JSON.parse(JSON.stringify(PRELOADED[k])); });
+save();
+
+function mk(y,m){ return `${y}-${String(m+1).padStart(2,'0')}`; }
+function curK(){ return mk(cy,cm); }
+
+function getMD(k){
+  if (!allData[k]) {
+    allData[k] = {};
+    CATS.forEach(c => { allData[k][c.key] = c.defaults.map(n=>({n,a:''})); });
+  } else {
+    CATS.forEach(c => { if (!allData[k][c.key]) allData[k][c.key] = []; });
+  }
+  return allData[k];
+}
+
+function save(){ localStorage.setItem('adm_familia_v2', JSON.stringify(allData)); document.getElementById('statusBar').textContent = 'Guardado: ' + new Date().toLocaleTimeString('es-AR'); }
+
+function fp(n){ return '$' + Math.round(n).toLocaleString('es-AR'); }
+function fusd(n){ return 'USD ' + Math.round(n).toLocaleString('es-AR'); }
+function catSum(items){ return (items||[]).reduce((s,i)=>s+(parseFloat(i.a)||0),0); }
+function grandTotal(d){ return CATS.reduce((s,c)=>s+catSum(d[c.key]),0); }
+function getRates(){ return { blue: parseFloat(document.getElementById('rBlue').value)||null, oficial: parseFloat(document.getElementById('rOficial').value)||null, mep: parseFloat(document.getElementById('rMep').value)||null }; }
+
+function changeMonth(dir){
+  cm += dir;
+  if (cm > 11){ cm = 0; cy++; }
+  if (cm < 0){ cm = 11; cy--; }
+  if (chartInst){ chartInst.destroy(); chartInst = null; }
+  renderAll();
+}
+
+async function fetchRates(){
+  document.getElementById('lastUpdate').textContent = 'Actualizando...';
+  try {
+    const r = await fetch('https://dolarapi.com/v1/dolares');
+    const arr = await r.json();
+    const f = casa => arr.find(d => d.casa?.toLowerCase() === casa);
+    const b = f('blue'), o = f('oficial'), m = f('bolsa') || f('mep');
+    if (b) document.getElementById('rBlue').value = b.venta;
+    if (o) document.getElementById('rOficial').value = o.venta;
+    if (m) document.getElementById('rMep').value = m.venta;
+    document.getElementById('lastUpdate').textContent = 'Actualizado ' + new Date().toLocaleTimeString('es-AR');
+    onRateChange();
+  } catch(e) {
+    document.getElementById('lastUpdate').textContent = 'Sin conexión — ingresá manualmente';
+  }
+}
+
+function onRateChange(){ renderSummary(); }
+
+function addItem(catKey){
+  const d = getMD(curK());
+  d[catKey].push({n:'', a:''});
+  save(); renderExpenses(); renderSummary(); renderComp(); updateChart();
+}
+
+function delItem(catKey, idx){
+  const d = getMD(curK());
+  d[catKey].splice(idx, 1);
+  save(); renderExpenses(); renderSummary(); renderComp(); updateChart();
+}
+
+function updateName(catKey, idx, val){
+  getMD(curK())[catKey][idx].n = val; save();
+}
+
+function updateAmount(catKey, idx, val){
+  getMD(curK())[catKey][idx].a = val; save();
+  const d = getMD(curK());
+  const el = document.getElementById('csum-'+catKey);
+  if (el) el.textContent = fp(catSum(d[catKey]));
+  renderSummary(); renderComp(); updateChart();
+}
+
+function renderExpenses(){
+  const d = getMD(curK());
+  const container = document.getElementById('expensesContainer');
+  container.innerHTML = '';
+  CATS.forEach(cat => {
+    const items = d[cat.key] || [];
+    const total = catSum(items);
+    const block = document.createElement('div');
+    block.className = 'cat-block';
+    const hdr = document.createElement('div');
+    hdr.className = 'cat-header';
+    hdr.innerHTML = `<span class="cat-name"><span class="cat-dot" style="background:${cat.color}"></span>${cat.name}</span><span class="cat-total" id="csum-${cat.key}">${fp(total)}</span>`;
+    const body = document.createElement('div');
+    body.className = 'cat-body';
+    const hdrRow = document.createElement('div');
+    hdrRow.className = 'item-row';
+    hdrRow.style.cssText = 'padding-bottom:4px;border-bottom:1px solid #ddd;margin-bottom:4px';
+    hdrRow.innerHTML = '<span style="font-size:11px;color:#999;font-weight:600">CONCEPTO</span><span style="font-size:11px;color:#999;font-weight:600;text-align:right">MONTO ($)</span><span></span>';
+    body.appendChild(hdrRow);
+    items.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <input type="text" value="${item.n||''}" placeholder="Concepto" onchange="updateName('${cat.key}',${idx},this.value)">
+        <input type="number" value="${item.a||''}" placeholder="0" oninput="updateAmount('${cat.key}',${idx},this.value)">
+        <button class="btn-del" onclick="delItem('${cat.key}',${idx})" title="Eliminar">&#215;</button>`;
+      body.appendChild(row);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.className = 'btn-add';
+    addBtn.textContent = '+ Agregar ítem';
+    addBtn.onclick = () => addItem(cat.key);
+    body.appendChild(addBtn);
+    hdr.onclick = () => { body.style.display = body.style.display === 'none' ? '' : ''; };
+    block.appendChild(hdr); block.appendChild(body);
+    container.appendChild(block);
+  });
+}
+
+function renderSummary(){
+  const d = getMD(curK());
+  const tot = grandTotal(d);
+  const r = getRates();
+  document.getElementById('totalARS').textContent = fp(tot);
+  document.getElementById('totBlue').textContent = r.blue ? fusd(tot/r.blue) : '—';
+  document.getElementById('totOficial').textContent = r.oficial ? fusd(tot/r.oficial) : '—';
+  document.getElementById('totMep').textContent = r.mep ? fusd(tot/r.mep) : '—';
+}
+
+function renderComp(){
+  let pm = cm-1, py = cy;
+  if (pm < 0){ pm = 11; py--; }
+  const prevKey = mk(py, pm);
+  const prevData = allData[prevKey];
+  const sec = document.getElementById('compSection');
+  const alert = document.getElementById('alertBar');
+  if (!prevData){ sec.style.display='none'; alert.style.display='none'; return; }
+  sec.style.display = '';
+  const curD = getMD(curK());
+  const curTot = grandTotal(curD);
+  const prevTot = grandTotal(prevData);
+  const diff = prevTot > 0 ? ((curTot - prevTot) / prevTot * 100) : null;
+  if (diff !== null){
+    alert.style.display = '';
+    const isUp = diff > 0;
+    alert.className = 'alert-bar ' + (isUp ? 'danger' : 'success');
+    alert.innerHTML = `<strong>${isUp ? '&#9650;' : '&#9660;'} ${isUp?'Atención':'Buenas noticias'}:</strong> Este mes gastaste <strong>${Math.abs(Math.round(diff))}% ${isUp?'más':'menos'}</strong> que ${MONTHS[pm]} (${fp(curTot)} vs ${fp(prevTot)})`;
+  }
+  let html = '';
+  let maxCat = {name:'', pct:-Infinity};
+  CATS.forEach(cat => {
+    const cur = catSum(curD[cat.key]);
+    const prev = catSum(prevData[cat.key]);
+    if (cur===0 && prev===0) return;
+    const pct = prev > 0 ? Math.round((cur-prev)/prev*100) : null;
+    if (pct !== null && pct > maxCat.pct) maxCat = {name: cat.name, pct};
+    const isUp = pct > 0;
+    html += `<div class="stat-row">
+      <span style="display:flex;align-items:center;gap:5px"><span class="cat-dot" style="background:${cat.color}"></span>${cat.name}</span>
+      ${pct!==null?`<span class="badge ${isUp?'up':pct<0?'down':'same'}">${isUp?'+':''}${pct}%</span>`:'<span class="badge same">—</span>'}
+    </div>`;
+  });
+  document.getElementById('compContent').innerHTML = html;
+}
+
+function initChart(){
+  const d = getMD(curK());
+  chartInst = new Chart(document.getElementById('catChart'), {
+    type: 'bar',
+    data: {
+      labels: CATS.map(c => c.name),
+      datasets: [{
+        data: CATS.map(c => catSum(d[c.key])),
+        backgroundColor: CATS.map(c => c.color + 'bb'),
+        borderColor: CATS.map(c => c.color),
+        borderWidth: 1.5,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: {display:false}, tooltip: {callbacks:{label:ctx=>' '+fp(ctx.parsed.x)}} },
+      scales: {
+        x: { grid:{color:'rgba(0,0,0,0.05)'}, ticks:{callback:v=>v===0?'0':'$'+Math.round(v/1000)+'k', font:{size:10}} },
+        y: { grid:{display:false}, ticks:{font:{size:11}} }
+      }
+    }
+  });
+}
+
+function updateChart(){
+  if (!chartInst) return;
+  const d = getMD(curK());
+  chartInst.data.datasets[0].data = CATS.map(c => catSum(d[c.key]));
+  chartInst.update('none');
+}
+
+function renderMonthLabel(){
+  document.getElementById('monthLabel').textContent = `${MONTHS[cm]} ${cy}`;
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(allData, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ADM_Familia_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData(evt){
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      allData = JSON.parse(e.target.result);
+      save();
+      if (chartInst){ chartInst.destroy(); chartInst = null; }
+      renderAll();
+      alert('Datos importados correctamente.');
+    } catch(err) { alert('Error al importar el archivo.'); }
+  };
+  reader.readAsText(file);
+}
+
+function renderAll(){
+  renderMonthLabel();
+  renderExpenses();
+  renderSummary();
+  renderComp();
+  if (!chartInst) initChart(); else updateChart();
+}
+
+renderAll();
+fetchRates();
+</script>
+</body>
+</html>
