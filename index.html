@@ -157,7 +157,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
   <div class="rpill b"><span class="lbl">Blue</span><input type="number" id="rBlue" placeholder="-" oninput="onRateChange()"></div>
   <div class="rpill o"><span class="lbl">Oficial</span><input type="number" id="rOficial" placeholder="-" oninput="onRateChange()"></div>
   <div class="rpill m"><span class="lbl">MEP</span><input type="number" id="rMep" placeholder="-" oninput="onRateChange()"></div>
-  <button class="btn-ref" onclick="fetchRates()">? Actualizar d?lar</button>
+  <button class="btn-ref" onclick="fetchRates()">~ Actualizar dolar</button>
   <span id="lastUpdate"></span>
   <div class="dtotals">
     <span>Blue <strong id="dBlue">-</strong></span>
@@ -179,17 +179,17 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
       <div id="compContent"><div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">Sin datos del mes anterior</div></div>
     </div>
     <div class="rc">
-      <h4>Por categor?a</h4>
+      <h4>Por categoria</h4>
       <div style="position:relative;height:240px"><canvas id="catChart"></canvas></div>
     </div>
   </div>
 </div>
 
 <div class="footer">
-  <button class="ba" onclick="exportData()">? Exportar JSON</button>
-  <button class="ba" onclick="document.getElementById('impFile').click()">? Importar JSON</button>
+  <button class="ba" onclick="exportData()">Exportar JSON</button>
+  <button class="ba" onclick="document.getElementById('impFile').click()">Importar JSON</button>
   <input type="file" id="impFile" accept=".json" style="display:none" onchange="importData(event)">
-  <button class="ba" onclick="window.print()">?? Imprimir</button>
+  <button class="ba" onclick="window.print()">Imprimir</button>
   <span id="statusBar">-</span>
 </div>
 
@@ -209,13 +209,13 @@ const db = firebase.database();
 
 // -- CATEGORIES ----------------------------------------------------------------
 const CATS = [
-  {key:'telefonia', name:'Telefon?a / Internet', color:'#3b82f6'},
+  {key:'telefonia', name:'Telefonia / Internet', color:'#3b82f6'},
   {key:'salud',     name:'Salud',                color:'#ec4899'},
   {key:'servicios', name:'Servicios',            color:'#10b981'},
   {key:'vivienda',  name:'Vivienda / Expensas',  color:'#8b5cf6'},
   {key:'seguros',   name:'Seguros',              color:'#f59e0b'},
-  {key:'personal',  name:'Personal dom?stico',   color:'#6b7280'},
-  {key:'educacion', name:'Educaci?n',            color:'#84cc16'},
+  {key:'personal',  name:'Personal domestico',   color:'#6b7280'},
+  {key:'educacion', name:'Educacion',            color:'#84cc16'},
   {key:'cuotas',    name:'Planes / Cuotas',      color:'#f97316'},
   {key:'impuestos', name:'Impuestos',            color:'#ef4444'},
 ];
@@ -226,91 +226,91 @@ const PRELOADED = {
   '2024-09':{
     telefonia:[{n:'Personal Nico',a:36441.45},{n:'Personal Resto',a:107176.48},{n:'Flow JH',a:60456.99}],
     salud:[{n:'Galeno',a:483317.73}],
-    servicios:[{n:'Edemsa (Rinc?n)',a:141107},{n:'Ecogas',a:178666.98},{n:'Aysam (Rinc?n)',a:29187.56},{n:'Edenor (JH)',a:18133.97}],
-    vivienda:[{n:'Expensas Rinc?n',a:410863.15},{n:'Expensas JH 4F',a:224265.28},{n:'Expensas JH S44',a:28341.44}],
+    servicios:[{n:'Edemsa (Rincon)',a:141107},{n:'Ecogas',a:178666.98},{n:'Aysam (Rincon)',a:29187.56},{n:'Edenor (JH)',a:18133.97}],
+    vivienda:[{n:'Expensas Rincon',a:410863.15},{n:'Expensas JH 4F',a:224265.28},{n:'Expensas JH S44',a:28341.44}],
     seguros:[{n:'Seguros MB',a:13292.33},{n:'Seguro Zanella',a:16900},{n:'Seguros Toyota',a:455247.50}],
     personal:[{n:'Raquel',a:351995.22},{n:'Raquel AFIP',a:17285.92},{n:'Jardinero',a:48000},{n:'Seresoli',a:46600}],
-    educacion:[{n:'Universidad UM',a:270050},{n:'San Nicol?s (Espi)',a:174870}],
+    educacion:[{n:'Universidad UM',a:270050},{n:'San Nicolas (Espi)',a:174870}],
     cuotas:[],impuestos:[]
   },
   '2024-10':{
     telefonia:[{n:'Personal Nico',a:36457.41},{n:'Personal Resto',a:346862.92},{n:'Flow JH',a:59353.74}],
     salud:[{n:'Galeno',a:505247.88}],
-    servicios:[{n:'Edemsa (Rinc?n)',a:141107},{n:'Ecogas',a:141453.51},{n:'Aysam (Rinc?n)',a:29187.56},{n:'Edenor (JH)',a:19763.24}],
-    vivienda:[{n:'Expensas Rinc?n',a:410863.15},{n:'Expensas JH 4F',a:239400.38},{n:'Expensas JH S44',a:39799.44}],
+    servicios:[{n:'Edemsa (Rincon)',a:141107},{n:'Ecogas',a:141453.51},{n:'Aysam (Rincon)',a:29187.56},{n:'Edenor (JH)',a:19763.24}],
+    vivienda:[{n:'Expensas Rincon',a:410863.15},{n:'Expensas JH 4F',a:239400.38},{n:'Expensas JH S44',a:39799.44}],
     seguros:[{n:'Seguros MB',a:13292.33},{n:'Seguro Zanella',a:16900},{n:'Seguros Toyota',a:455247.50}],
     personal:[{n:'Raquel',a:351995.22},{n:'Raquel AFIP',a:17285.92},{n:'Jardinero',a:60000},{n:'Seresoli',a:46600}],
-    educacion:[{n:'Universidad UM',a:144900},{n:'San Nicol?s (Espi)',a:174870}],
+    educacion:[{n:'Universidad UM',a:144900},{n:'San Nicolas (Espi)',a:174870}],
     cuotas:[],impuestos:[]
   },
   '2024-11':{
     telefonia:[{n:'Personal Nico',a:32458.50},{n:'Personal Resto',a:128525.83},{n:'Flow JH',a:59353.74}],
     salud:[{n:'Galeno',a:540586.75}],
-    servicios:[{n:'Edemsa (Rinc?n)',a:141107},{n:'Ecogas',a:137076.23},{n:'Aysam (Rinc?n)',a:29187.56},{n:'Edenor (JH)',a:6952.31}],
-    vivienda:[{n:'Expensas Rinc?n',a:433881.15},{n:'Expensas JH 4F',a:245950.28},{n:'Expensas JH S44',a:26662.44}],
+    servicios:[{n:'Edemsa (Rincon)',a:141107},{n:'Ecogas',a:137076.23},{n:'Aysam (Rincon)',a:29187.56},{n:'Edenor (JH)',a:6952.31}],
+    vivienda:[{n:'Expensas Rincon',a:433881.15},{n:'Expensas JH 4F',a:245950.28},{n:'Expensas JH S44',a:26662.44}],
     seguros:[{n:'Seguros MB',a:13292.33},{n:'Seguro Zanella',a:16473},{n:'Seguros Toyota',a:455113}],
     personal:[{n:'Raquel',a:347748.60},{n:'Raquel AFIP',a:17437.92},{n:'Jardinero',a:60000},{n:'Seresoli',a:46600}],
-    educacion:[{n:'San Nicol?s (Espi)',a:174870}],
+    educacion:[{n:'San Nicolas (Espi)',a:174870}],
     cuotas:[],impuestos:[]
   },
   '2024-12':{
     telefonia:[{n:'Personal Nico',a:32450.61},{n:'Personal Resto',a:168123.49},{n:'Flow JH',a:61780.49}],
     salud:[{n:'Galeno',a:555353.25}],
-    servicios:[{n:'Edemsa (Rinc?n)',a:255840.50},{n:'Ecogas',a:103655.43},{n:'Aysam (Rinc?n)',a:83561.91},{n:'Edenor (JH)',a:6952.31}],
-    vivienda:[{n:'Expensas Rinc?n',a:455673.15},{n:'Expensas JH 4F',a:261150.28},{n:'Expensas JH S44',a:35936.44}],
+    servicios:[{n:'Edemsa (Rincon)',a:255840.50},{n:'Ecogas',a:103655.43},{n:'Aysam (Rincon)',a:83561.91},{n:'Edenor (JH)',a:6952.31}],
+    vivienda:[{n:'Expensas Rincon',a:455673.15},{n:'Expensas JH 4F',a:261150.28},{n:'Expensas JH S44',a:35936.44}],
     seguros:[{n:'Seguros MB',a:13292.33},{n:'Seguro Zanella',a:16473},{n:'Seguros Toyota',a:422323.40}],
     personal:[{n:'Raquel',a:347748.60},{n:'Raquel AFIP',a:17437.92},{n:'Jardinero',a:60000},{n:'Seresoli',a:46600}],
-    educacion:[{n:'Universidad UM',a:400000},{n:'San Nicol?s (Espi)',a:174870}],
+    educacion:[{n:'Universidad UM',a:400000},{n:'San Nicolas (Espi)',a:174870}],
     cuotas:[],impuestos:[]
   },
   '2025-10':{
     telefonia:[{n:'Personal Resto',a:227353.34},{n:'Flow JH',a:72154.80}],
     salud:[{n:'Galeno',a:831839.26}],
-    servicios:[{n:'Edemsa (Rinc?n)',a:482000},{n:'Ecogas',a:232000},{n:'Aysam (Rinc?n)',a:601000},{n:'Edenor (JH)',a:24420}],
-    vivienda:[{n:'Expensas Rinc?n',a:455673.15},{n:'Expensas JH 4F',a:393419.28},{n:'Expensas JH S44',a:356072.26}],
+    servicios:[{n:'Edemsa (Rincon)',a:482000},{n:'Ecogas',a:232000},{n:'Aysam (Rincon)',a:601000},{n:'Edenor (JH)',a:24420}],
+    vivienda:[{n:'Expensas Rincon',a:455673.15},{n:'Expensas JH 4F',a:393419.28},{n:'Expensas JH S44',a:356072.26}],
     seguros:[{n:'Seguros MB',a:13292.33},{n:'Seguro Zanella',a:16473},{n:'Seguros Toyota',a:443000}],
     personal:[{n:'Raquel',a:347748.60},{n:'Raquel AFIP',a:33227.27},{n:'Jardinero',a:60000},{n:'Seresoli',a:46600}],
-    educacion:[{n:'San Nicol?s (Espi)',a:174870}],
+    educacion:[{n:'San Nicolas (Espi)',a:174870}],
     cuotas:[],impuestos:[]
   },
   '2025-11':{
     telefonia:[{n:'Personal Resto',a:227353.34},{n:'Flow JH',a:72154.80}],
     salud:[{n:'Galeno',a:831839.26}],
-    servicios:[{n:'Edemsa (Rinc?n)',a:482000},{n:'Ecogas',a:232000},{n:'Aysam (Rinc?n)',a:601000},{n:'Edenor (JH)',a:24420}],
-    vivienda:[{n:'Expensas Rinc?n',a:455673.15},{n:'Expensas JH 4F',a:393419.28},{n:'Expensas JH S44',a:356072.26}],
+    servicios:[{n:'Edemsa (Rincon)',a:482000},{n:'Ecogas',a:232000},{n:'Aysam (Rincon)',a:601000},{n:'Edenor (JH)',a:24420}],
+    vivienda:[{n:'Expensas Rincon',a:455673.15},{n:'Expensas JH 4F',a:393419.28},{n:'Expensas JH S44',a:356072.26}],
     seguros:[{n:'Seguros MB',a:13292.33},{n:'Seguro Zanella',a:16473},{n:'Seguros Toyota',a:443000}],
     personal:[{n:'Raquel',a:347748.60},{n:'Raquel AFIP',a:33227.27},{n:'Jardinero',a:60000},{n:'Seresoli',a:46600}],
-    educacion:[{n:'San Nicol?s (Espi)',a:174870}],
+    educacion:[{n:'San Nicolas (Espi)',a:174870}],
     cuotas:[],impuestos:[]
   },
   '2025-12':{
     telefonia:[{n:'Personal',a:472597.64},{n:'Flow',a:76632.26}],
     salud:[{n:'Galeno',a:869692.93}],
-    servicios:[{n:'Ecogas',a:127414.54},{n:'Edemsa (Rinc?n)',a:194890.50},{n:'Edenor (JH)',a:26355},{n:'Aysam (Rinc?n)',a:1331708.26}],
-    vivienda:[{n:'Expensas Rinc?n',a:564084.15}],
+    servicios:[{n:'Ecogas',a:127414.54},{n:'Edemsa (Rincon)',a:194890.50},{n:'Edenor (JH)',a:26355},{n:'Aysam (Rincon)',a:1331708.26}],
+    vivienda:[{n:'Expensas Rincon',a:564084.15}],
     seguros:[],personal:[],educacion:[{n:'Facu Nico',a:117000}],cuotas:[],impuestos:[]
   },
   '2026-01':{
     telefonia:[{n:'Personal',a:338849.20},{n:'Flow',a:78104.29}],
     salud:[{n:'Galeno',a:891435.25}],
-    servicios:[{n:'Ecogas',a:113718.19},{n:'Edemsa (Rinc?n)',a:285070.50},{n:'Edenor (JH)',a:16712.17},{n:'Aysam (Rinc?n)',a:742850.86}],
-    vivienda:[{n:'Expensas Rinc?n',a:600171.15}],
+    servicios:[{n:'Ecogas',a:113718.19},{n:'Edemsa (Rincon)',a:285070.50},{n:'Edenor (JH)',a:16712.17},{n:'Aysam (Rincon)',a:742850.86}],
+    vivienda:[{n:'Expensas Rincon',a:600171.15}],
     seguros:[{n:'Seguro SW4',a:250000},{n:'Seguro Hilux',a:90000},{n:'Seguro RAV4',a:180000}],
     personal:[{n:'Jardinero',a:270000}],educacion:[],cuotas:[],impuestos:[]
   },
   '2026-02':{
     telefonia:[{n:'Personal',a:263334.18},{n:'Flow',a:82299.99}],
     salud:[{n:'Galeno',a:916395.44}],
-    servicios:[{n:'Ecogas',a:86379.34},{n:'Edemsa (Rinc?n)',a:285070.52},{n:'Edenor (JH)',a:231.01},{n:'Aysam (Rinc?n)',a:76996}],
-    vivienda:[{n:'Expensas Rinc?n',a:631552.15}],
+    servicios:[{n:'Ecogas',a:86379.34},{n:'Edemsa (Rincon)',a:285070.52},{n:'Edenor (JH)',a:231.01},{n:'Aysam (Rincon)',a:76996}],
+    vivienda:[{n:'Expensas Rincon',a:631552.15}],
     seguros:[{n:'Seguro Hilux',a:102600},{n:'Seguro SW4',a:280000},{n:'Seguro RAV4',a:230000}],
     personal:[{n:'Jardinero',a:120000}],educacion:[],cuotas:[],impuestos:[]
   },
   '2026-03':{
     telefonia:[{n:'Personal + Flow',a:84888.57}],
     salud:[{n:'Galeno',a:942970.94}],
-    servicios:[{n:'Ecogas',a:83349.91},{n:'Edemsa (Rinc?n)',a:307827.50},{n:'Edenor (JH)',a:19376.36},{n:'Aysam (Rinc?n)',a:77000}],
-    vivienda:[{n:'Expensas Rinc?n',a:646938.15}],
+    servicios:[{n:'Ecogas',a:83349.91},{n:'Edemsa (Rincon)',a:307827.50},{n:'Edenor (JH)',a:19376.36},{n:'Aysam (Rincon)',a:77000}],
+    vivienda:[{n:'Expensas Rincon',a:646938.15}],
     seguros:[{n:'Seguro Hilux',a:102000},{n:'Seguro SW4',a:280000},{n:'Seguro RAV4',a:230000}],
     personal:[{n:'Contador',a:390000},{n:'Jardinero',a:120000}],
     educacion:[{n:'Colegio Espi',a:1797000}],
@@ -319,8 +319,8 @@ const PRELOADED = {
   '2026-04':{
     telefonia:[{n:'Personal',a:215597.57},{n:'Flow',a:87789}],
     salud:[{n:'Galeno',a:970317.08}],
-    servicios:[{n:'Ecogas',a:52965.18},{n:'Edemsa (Rinc?n)',a:307827.50},{n:'Aysam (Rinc?n)',a:128982.34}],
-    vivienda:[{n:'Expensas Rinc?n',a:647138.15}],
+    servicios:[{n:'Ecogas',a:52965.18},{n:'Edemsa (Rincon)',a:307827.50},{n:'Aysam (Rincon)',a:128982.34}],
+    vivienda:[{n:'Expensas Rincon',a:647138.15}],
     seguros:[{n:'Seguro Hilux',a:120000}],
     personal:[{n:'Contador',a:390000},{n:'Jardinero',a:140000}],
     educacion:[],cuotas:[],impuestos:[]
@@ -328,8 +328,8 @@ const PRELOADED = {
   '2026-05':{
     telefonia:[{n:'Personal + Flow',a:106720}],
     salud:[{n:'Galeno',a:1002989.19}],
-    servicios:[{n:'Ecogas',a:52699.22},{n:'Edemsa (Rinc?n)',a:210000},{n:'Aysam (Rinc?n)',a:52000}],
-    vivienda:[{n:'Expensas Rinc?n',a:647138.15}],
+    servicios:[{n:'Ecogas',a:52699.22},{n:'Edemsa (Rincon)',a:210000},{n:'Aysam (Rincon)',a:52000}],
+    vivienda:[{n:'Expensas Rincon',a:647138.15}],
     seguros:[{n:'Seguro Hilux',a:120000},{n:'Seguro RAV4',a:230000},{n:'Seguro Zanella',a:16900}],
     personal:[{n:'Contador',a:140000},{n:'Jardinero',a:120000}],
     educacion:[],cuotas:[],impuestos:[]
@@ -337,11 +337,11 @@ const PRELOADED = {
   '2026-06':{
     telefonia:[{n:'Personal + Flow',a:608011.74}],
     salud:[{n:'Galeno',a:1027402.75}],
-    servicios:[{n:'Ecogas',a:216596.31},{n:'Edemsa (Rinc?n)',a:219441.50},{n:'Aysam (Rinc?n)',a:69916.18}],
-    vivienda:[{n:'Expensas Rinc?n',a:647158.15}],
+    servicios:[{n:'Ecogas',a:216596.31},{n:'Edemsa (Rincon)',a:219441.50},{n:'Aysam (Rincon)',a:69916.18}],
+    vivienda:[{n:'Expensas Rincon',a:647158.15}],
     seguros:[{n:'Seguros (flota)',a:374648}],
     personal:[{n:'Contador',a:140000},{n:'Jardinero',a:120000}],
-    educacion:[{n:'San Nicol?s (Espi)',a:485000}],
+    educacion:[{n:'San Nicolas (Espi)',a:485000}],
     cuotas:[{n:'Plan SW4',a:347806.87},{n:'Plan Hilux',a:258660.42}],
     impuestos:[{n:'AFIP',a:2970000}]
   }
@@ -484,10 +484,10 @@ function renderExpenses(){
       <span class="cname">${cat.name}</span>
       <div class="cright">
         <span class="ctotal">${fp(total)}</span>
-        <span class="cpaidinfo">${fp(paid)} pagado ? ${pct}%</span>
+        <span class="cpaidinfo">${fp(paid)} pagado / ${pct}%</span>
         <div class="pbar cpbar"><div class="pfill g" style="width:${pct}%"></div></div>
       </div>
-      <span class="cchev ${isOpen?'open':''}">?</span>`;
+      <span class="cchev ${isOpen?'open':''}">v</span>`;
     hdr.onclick = () => {
       if(expanded.has(cat.key)) expanded.delete(cat.key); else expanded.add(cat.key);
       hdr.querySelector('.cchev').classList.toggle('open');
@@ -512,13 +512,13 @@ function renderExpenses(){
         <button class="pbtn ${item.paid?'paid':'pend'}" onclick="togglePaid('${cat.key}',${idx})">
           ${item.paid?'OK Pagado':'Pendiente'}
         </button>
-        <button class="bdel" onclick="delItem('${cat.key}',${idx})" title="Eliminar">?</button>`;
+        <button class="bdel" onclick="delItem('${cat.key}',${idx})" title="Eliminar">x</button>`;
       body.appendChild(row);
     });
 
     const addBtn = document.createElement('button');
     addBtn.className='badd';
-    addBtn.textContent='+ Agregar ?tem';
+    addBtn.textContent='+ Agregar item';
     addBtn.onclick=()=>addItem(cat.key);
     body.appendChild(addBtn);
 
@@ -544,10 +544,10 @@ function renderStats(){
   document.getElementById('stTotal').textContent = fp(total);
   document.getElementById('stUsd').textContent = r.blue ? '~ '+fusd(total,r.blue)+' blue' : '-';
   document.getElementById('stPaid').textContent = fp(paid);
-  document.getElementById('stPaidPct').textContent = `${paidItems} de ${allItems} ?tems`;
+  document.getElementById('stPaidPct').textContent = `${paidItems} de ${allItems} items`;
   document.getElementById('stPaidBar').style.width = pct+'%';
   document.getElementById('stPend').textContent = fp(pend);
-  document.getElementById('stPendCount').textContent = `${pendItems} ?tem${pendItems!==1?'s':''} sin pagar`;
+  document.getElementById('stPendCount').textContent = `${pendItems} item${pendItems!==1?'s':''} sin pagar`;
   document.getElementById('stPct').textContent = pct+'%';
   document.getElementById('stPctBar').style.width = pct+'%';
   document.getElementById('stItemCount').textContent = `${paidItems}/${allItems} pagados`;
@@ -573,7 +573,7 @@ function renderComp(){
   if(diff!==null){
     const up = diff>0;
     alert.className='alert-bar '+(up?'danger':'success');
-    alert.innerHTML=`<strong>${up?'?':'?'} ${up?'Atenci?n':'Buenas noticias'}:</strong> Este mes gastaste <strong>${Math.abs(Math.round(diff))}% ${up?'m?s':'menos'}</strong> que ${MONTHS[pm]} (${fp(cur)} vs ${fp(prev)})`;
+    alert.innerHTML=`<strong>${up?'!':'OK'} ${up?'Atencion':'Buenas noticias'}:</strong> Este mes gastaste <strong>${Math.abs(Math.round(diff))}% ${up?'mas':'menos'}</strong> que ${MONTHS[pm]} (${fp(cur)} vs ${fp(prev)})`;
   }
 
   let html='';
@@ -696,7 +696,7 @@ async function fetchRates(){
     document.getElementById('lastUpdate').textContent='Actualizado '+new Date().toLocaleTimeString('es-AR');
     onRateChange();
   }catch(e){
-    document.getElementById('lastUpdate').textContent='Sin conexi?n';
+    document.getElementById('lastUpdate').textContent='Sin conexion';
   }
 }
 
