@@ -37,8 +37,9 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
 .sc.amber .val{color:var(--amber)}
 .sc.purple .val{color:var(--purple)}
 .sc .sub{font-size:11px;color:var(--muted2);margin-top:3px}
-.sc-extra{font-size:10px;color:var(--muted);margin-top:7px;padding-top:7px;border-top:1px solid var(--border)}
-.sc-extra strong{color:var(--muted2)}
+.sc-extra{font-size:10px;color:var(--muted2);margin-top:7px;padding-top:7px;border-top:1px solid var(--border);line-height:1.9}
+.sc-extra strong{color:var(--text)}
+.sc-extra .vs-avg{font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px}
 .pbar{margin-top:8px;background:rgba(255,255,255,.05);border-radius:99px;height:4px;overflow:hidden}
 .pfill{height:100%;border-radius:99px;transition:width .6s ease}
 .pfill.g{background:var(--green)}
@@ -119,6 +120,24 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
 .badge.up{background:rgba(255,68,96,.12);color:var(--red)}
 .badge.dn{background:rgba(0,229,124,.12);color:var(--green)}
 .badge.sm{background:rgba(255,255,255,.06);color:var(--muted2)}
+/* INSIGHTS & SUBS */
+.ins-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04)}
+.ins-row:last-child{border-bottom:none}
+.ins-lbl{color:var(--muted2);font-size:11px;flex:1;padding-right:6px}
+.ins-val{font-weight:700;color:var(--text);font-size:12px;white-space:nowrap}
+.sub-item{padding:4px 0;font-size:11px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.03)}
+.sub-item:last-child{border-bottom:none}
+.sub-total-row{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px}
+/* CUOTAS */
+.cuotas-pill{font-size:10px;background:rgba(168,85,247,.15);color:var(--purple);border-radius:4px;padding:1px 6px;font-weight:700;margin-left:3px}
+.ir-cuotas{display:none;align-items:center;gap:6px;padding:2px 0 6px;flex-wrap:wrap}
+.ir-cuotas.open{display:flex}
+.cup-lbl{font-size:10px;color:var(--muted2)}
+.cup-input{font-size:12px;width:54px;border:1px solid var(--border);border-radius:5px;padding:3px 6px;background:var(--card2);color:var(--text);outline:none}
+.cup-input:focus{border-color:var(--purple)}
+.cup-total{font-size:11px;color:var(--purple);font-weight:700;margin-left:2px}
+.cuotas-toggle{font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0 3px;text-decoration:underline;flex-shrink:0}
+.cuotas-toggle:hover{color:var(--purple)}
 /* FOOTER */
 .footer{background:var(--card);border-top:1px solid var(--border);padding:10px 24px;display:flex;gap:8px;align-items:center}
 .ba{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:12px;color:var(--text);font-weight:500}
@@ -171,7 +190,10 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
     <div class="lbl">Total del mes</div>
     <div class="val" id="stTotal">-</div>
     <div class="sub" id="stUsd">-</div>
-    <div class="sc-extra">Proyeccion anual: <strong id="stProj">-</strong></div>
+    <div class="sc-extra">
+      Proy. anual: <strong id="stProj">-</strong><br>
+      Prom. 3m: <strong id="stAvg">-</strong>&nbsp;<span id="stVsAvg" class="vs-avg"></span>
+    </div>
   </div>
   <div class="sc green">
     <div class="lbl">&#10003; Pagado</div>
@@ -214,6 +236,14 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
     <div id="expCont"></div>
   </div>
   <div class="rp">
+    <div class="rc">
+      <h4>Insights del mes</h4>
+      <div id="insightsCont"><div style="color:var(--muted);font-size:12px;text-align:center;padding:8px">Cargando...</div></div>
+    </div>
+    <div class="rc">
+      <h4>Suscripciones detectadas</h4>
+      <div id="subsCont"><div style="color:var(--muted);font-size:12px;text-align:center;padding:8px">Cargando...</div></div>
+    </div>
     <div class="rc">
       <h4>vs. Mes anterior</h4>
       <div id="compContent"><div style="color:#94a3b8;font-size:12px;text-align:center;padding:8px">Sin datos del mes anterior</div></div>
@@ -421,7 +451,9 @@ function prepData(key, raw){
       a: parseFloat(it.a)||0,
       paid: it.paid !== undefined ? !!it.paid : past,
       detalle: it.detalle||'',
-      freq: it.freq||'mensual'
+      freq: it.freq||'mensual',
+      cuotas: parseInt(it.cuotas)||1,
+      interes: parseFloat(it.interes)||0
     }));
   });
   return out;
@@ -570,8 +602,16 @@ function renderExpenses(){
           </button>
           <button class="bdel" onclick="delItem('${cat.key}',${idx})" title="Eliminar">x</button>
         </div>
-        <div class="ir-det">
-          <input type="text" class="det-input" value="${(item.detalle||'').replace(/"/g,'&quot;')}" placeholder="Detalle: NIC, patente, nota..." onchange="updDetalle('${cat.key}',${idx},this.value)">
+        <div class="ir-det" style="display:flex;align-items:center;gap:6px">
+          <input type="text" class="det-input" style="flex:1" value="${(item.detalle||'').replace(/"/g,'&quot;')}" placeholder="Detalle: NIC, patente, nota..." onchange="updDetalle('${cat.key}',${idx},this.value)">
+          <button class="cuotas-toggle" onclick="toggleCuotas('${cat.key}',${idx})">${item.cuotas>1?item.cuotas+'c &bull;':'+ cuotas'}</button>
+        </div>
+        <div class="ir-cuotas${item.cuotas>1?' open':''}" id="cp_${cat.key}_${idx}">
+          <span class="cup-lbl">Cuotas:</span>
+          <input type="number" class="cup-input" value="${item.cuotas>1?item.cuotas:''}" min="2" max="60" placeholder="ej: 12" onchange="updCuotas('${cat.key}',${idx},this.value)">
+          <span class="cup-lbl">Interes %:</span>
+          <input type="number" class="cup-input" value="${item.interes>0?item.interes:''}" min="0" step="0.5" placeholder="0" onchange="updInteres('${cat.key}',${idx},this.value)">
+          ${item.cuotas>1?`<span class="cup-total">Real: ${fp(item.a*item.cuotas*(1+item.interes/100))}</span>`:''}
         </div>`;
       body.appendChild(row);
     });
@@ -604,6 +644,17 @@ function renderStats(){
   document.getElementById('stTotal').textContent = fp(total);
   document.getElementById('stUsd').textContent = r.blue ? '~ '+fusd(total,r.blue)+' blue' : '-';
   document.getElementById('stProj').textContent = fp(total*12);
+  const avg3=getAvg3M();
+  if(avg3){
+    document.getElementById('stAvg').textContent=fp(avg3.avg);
+    const vsAvg=Math.round((total-avg3.avg)/avg3.avg*100);
+    const vsEl=document.getElementById('stVsAvg');
+    vsEl.textContent=(vsAvg>=0?'+':'')+vsAvg+'%';
+    vsEl.style.color=vsAvg>15?'var(--red)':vsAvg<-15?'var(--green)':'var(--muted2)';
+    vsEl.style.fontWeight='700';
+  } else {
+    document.getElementById('stAvg').textContent='-';
+  }
   document.getElementById('stPaid').textContent = fp(paid);
   document.getElementById('stPaidPct').textContent = `${paidItems} de ${allItems} items`;
   document.getElementById('stPaidBar').style.width = pct+'%';
@@ -687,11 +738,81 @@ function renderChart(){
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
       plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+fp(ctx.parsed.x)}}},
       scales:{
-        x:{stacked:true, grid:{color:'rgba(0,0,0,0.04)'}, ticks:{callback:v=>v===0?'0':'$'+Math.round(v/1000)+'k', font:{size:10}}},
-        y:{stacked:true, grid:{display:false}, ticks:{font:{size:10}}}
+        x:{stacked:true, grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:'#7a90a8',callback:v=>v===0?'0':'$'+Math.round(v/1000)+'k', font:{size:10}}},
+        y:{stacked:true, grid:{display:false}, ticks:{color:'#7a90a8',font:{size:10}}}
       }
     }
   });
+}
+
+// -- ANALYTICS -----------------------------------------------------------------
+function getAvg3M(){
+  const totals=[];
+  let y=cy,m=cm;
+  for(let i=0;i<8&&totals.length<3;i++){
+    m--;if(m<0){m=11;y--;}
+    const key=mk(y,m);
+    if(PRELOADED[key]){const t=grandTotal(prepData(key,PRELOADED[key]));if(t>0)totals.push(t);}
+  }
+  if(!totals.length) return null;
+  return {avg:totals.reduce((s,t)=>s+t,0)/totals.length,count:totals.length};
+}
+
+function renderInsights(){
+  if(!curData) return;
+  const cont=document.getElementById('insightsCont');
+  const gTotal=grandTotal(curData)||0;
+  const cats=CATS.map(c=>({cat:c,total:catSum(curData[c.key])})).filter(x=>x.total>0);
+  cats.sort((a,b)=>b.total-a.total);
+  const avg3=getAvg3M();
+  const allItems=CATS.reduce((a,c)=>a+(curData[c.key]||[]).length,0);
+  let html='';
+  html+=`<div class="ins-row"><span class="ins-lbl">Proyeccion anual</span><span class="ins-val" style="color:var(--blue)">${fp(gTotal*12)}</span></div>`;
+  if(avg3){
+    const vsAvg=Math.round((gTotal-avg3.avg)/avg3.avg*100);
+    const sign=vsAvg>=0?'+':'';
+    const col=vsAvg>15?'var(--red)':vsAvg<-15?'var(--green)':'var(--amber)';
+    html+=`<div class="ins-row"><span class="ins-lbl">Promedio ultimos ${avg3.count} meses</span><span class="ins-val">${fp(avg3.avg)}</span></div>`;
+    html+=`<div class="ins-row"><span class="ins-lbl">Este mes vs promedio</span><span class="ins-val" style="color:${col}">${sign}${vsAvg}%</span></div>`;
+  }
+  if(cats.length>0){
+    const top=cats[0];
+    const pct=gTotal>0?Math.round(top.total/gTotal*100):0;
+    html+=`<div class="ins-row"><span class="ins-lbl">Mayor gasto <span style="color:${top.cat.color}">&bull; ${top.cat.name}</span></span><span class="ins-val">${fp(top.total)} <small style="color:var(--muted2);font-size:10px">(${pct}%)</small></span></div>`;
+    if(cats.length>1){
+      const bot=cats[cats.length-1];
+      html+=`<div class="ins-row"><span class="ins-lbl">Menor gasto <span style="color:${bot.cat.color}">&bull; ${bot.cat.name}</span></span><span class="ins-val">${fp(bot.total)}</span></div>`;
+    }
+  }
+  if(allItems>0&&gTotal>0) html+=`<div class="ins-row"><span class="ins-lbl">Promedio por item</span><span class="ins-val">${fp(gTotal/allItems)}</span></div>`;
+  cont.innerHTML=html||'<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px">Sin datos</div>';
+}
+
+function renderSubs(){
+  if(!curData) return;
+  const cont=document.getElementById('subsCont');
+  const subs=[];
+  CATS.forEach(cat=>{
+    (curData[cat.key]||[]).forEach(item=>{
+      if((!item.freq||item.freq==='mensual')&&item.a>0) subs.push({cat,item,monthly:item.a});
+    });
+  });
+  subs.sort((a,b)=>b.monthly-a.monthly);
+  const totalAnual=subs.reduce((s,x)=>s+x.monthly*12,0);
+  let html='';
+  subs.slice(0,6).forEach(s=>{
+    const cuotasBadge=s.item.cuotas>1?`<span class="cuotas-pill">${s.item.cuotas}c</span>`:'';
+    html+=`<div class="sub-item">
+      <span style="display:flex;align-items:center;gap:5px;overflow:hidden">
+        <span style="width:6px;height:6px;border-radius:50%;background:${s.cat.color};flex-shrink:0;display:inline-block"></span>
+        <span style="color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.item.n||'Sin nombre'}</span>${cuotasBadge}
+      </span>
+      <span style="font-weight:700;color:var(--text);flex-shrink:0;margin-left:6px">${fp(s.monthly)}/m</span>
+    </div>`;
+  });
+  if(subs.length>6) html+=`<div style="font-size:10px;color:var(--muted);text-align:center;padding:3px">+ ${subs.length-6} mas...</div>`;
+  if(subs.length>0) html+=`<div class="sub-total-row"><span style="color:var(--muted2)">${subs.length} items &bull; total anual</span><strong style="color:var(--green)">${fp(totalAnual)}</strong></div>`;
+  cont.innerHTML=html||'<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px">Sin suscripciones mensuales</div>';
 }
 
 // -- RENDER ALL ----------------------------------------------------------------
@@ -703,6 +824,8 @@ function renderAll(){
   renderMonthLabel();
   renderExpenses();
   renderStats();
+  renderInsights();
+  renderSubs();
   renderComp();
   renderChart();
 }
@@ -724,7 +847,7 @@ function togglePaid(cat,idx){
   scheduleWrite();
 }
 function addItem(cat){
-  curData[cat].push({n:'',a:0,paid:false});
+  curData[cat].push({n:'',a:0,paid:false,detalle:'',freq:'mensual',cuotas:1,interes:0});
   renderExpenses(); renderStats(); renderChart();
   scheduleWrite();
 }
@@ -741,6 +864,18 @@ function updFreq(cat,idx,val){
   curData[cat][idx].freq=val;
   renderExpenses(); renderStats(); renderChart();
   scheduleWrite();
+}
+function toggleCuotas(cat,idx){
+  const panel=document.getElementById('cp_'+cat+'_'+idx);
+  if(panel) panel.classList.toggle('open');
+}
+function updCuotas(cat,idx,val){
+  curData[cat][idx].cuotas=parseInt(val)||1;
+  renderExpenses(); scheduleWrite();
+}
+function updInteres(cat,idx,val){
+  curData[cat][idx].interes=parseFloat(val)||0;
+  renderExpenses(); scheduleWrite();
 }
 
 // -- NAVIGATION ----------------------------------------------------------------
