@@ -69,14 +69,23 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
 /* ITEM ROWS */
 .cbody{border-top:1px solid var(--border);padding:8px 16px 12px;display:none}
 .cbody.open{display:block}
-.ihr{display:grid;grid-template-columns:1fr 130px 80px 26px;gap:8px;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.ihr{display:grid;grid-template-columns:1fr 120px 58px 80px 26px;gap:8px;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px}
 .ihr span{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted)}
-.ir{display:grid;grid-template-columns:1fr 130px 80px 26px;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid #f1f5f9;transition:background .1s}
-.ir:last-of-type{border-bottom:none}
+.ir-wrap{border-bottom:1px solid #f1f5f9;}
+.ir-wrap:last-of-type{border-bottom:none;}
+.ir{display:grid;grid-template-columns:1fr 120px 58px 80px 26px;gap:8px;align-items:center;padding:6px 0 2px;}
+.amt-group{display:flex;flex-direction:column;gap:2px;}
+.amt-group input[type=number]{font-size:13px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:4px 8px;width:100%;background:#fff;outline:none}
+.amt-group input[type=number]:focus{border-color:var(--blue)}
+.monthly-hint{font-size:10px;color:var(--muted);text-align:right;}
+.freq-sel{font-size:11px;border:1px solid var(--border);border-radius:6px;padding:4px 3px;background:#fff;color:var(--text);cursor:pointer;outline:none;width:100%;}
+.freq-sel:focus{border-color:var(--blue);}
+.ir-det{padding:0 0 5px;}
+.det-input{width:100%;font-size:11px;color:var(--muted);border:none;background:transparent;outline:none;padding:1px 4px;font-style:italic;}
+.det-input:focus{background:#f8fafc;border-radius:4px;}
+.det-input::placeholder{color:#cbd5e1;}
 .ir input[type=text]{font-size:13px;color:var(--text);border:none;background:transparent;outline:none;width:100%}
 .ir input[type=text]:focus{background:#eff6ff;border-radius:4px;padding:2px 6px}
-.ir input[type=number]{font-size:13px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:4px 8px;width:100%;background:#fff;outline:none}
-.ir input[type=number]:focus{border-color:var(--blue)}
 /* PAID BUTTON */
 .pbtn{display:flex;align-items:center;justify-content:center;padding:3px 6px;border-radius:20px;border:none;cursor:pointer;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.2px;transition:all .2s;white-space:nowrap;width:76px}
 .pbtn.paid{background:var(--green-bg);color:#065f46}
@@ -106,7 +115,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
   .main{grid-template-columns:1fr}
   .rp{border-top:1px solid var(--border)}
   .dtotals{display:none}
-  .ihr,.ir{grid-template-columns:1fr 110px 72px 24px}
+  .ihr,.ir{grid-template-columns:1fr 100px 50px 68px 22px}
 }
 @media(max-width:500px){
   .stats-bar{grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px 6px}
@@ -379,7 +388,9 @@ function prepData(key, raw){
     out[c.key] = items.map(it => ({
       n: it.n||'',
       a: parseFloat(it.a)||0,
-      paid: it.paid !== undefined ? !!it.paid : past
+      paid: it.paid !== undefined ? !!it.paid : past,
+      detalle: it.detalle||'',
+      freq: it.freq||'mensual'
     }));
   });
   return out;
@@ -387,8 +398,9 @@ function prepData(key, raw){
 
 function fp(n){ return '$'+Math.round(n).toLocaleString('es-AR'); }
 function fusd(n,r){ return r ? 'USD '+Math.round(n/r).toLocaleString('es-AR') : '-'; }
-function catSum(items){ return (items||[]).reduce((s,i)=>s+(parseFloat(i.a)||0),0); }
-function catPaid(items){ return (items||[]).filter(i=>i.paid).reduce((s,i)=>s+(parseFloat(i.a)||0),0); }
+function monthlyAmt(item){ const a=parseFloat(item.a)||0; if(item.freq==='semanal') return a*4.33; if(item.freq==='anual') return a/12; return a; }
+function catSum(items){ return (items||[]).reduce((s,i)=>s+monthlyAmt(i),0); }
+function catPaid(items){ return (items||[]).filter(i=>i.paid).reduce((s,i)=>s+monthlyAmt(i),0); }
 function paidCount(items){ return (items||[]).filter(i=>i.paid).length; }
 function grandTotal(d){ return CATS.reduce((s,c)=>s+catSum(d[c.key]),0); }
 function grandPaid(d){ return CATS.reduce((s,c)=>s+catPaid(d[c.key]),0); }
@@ -500,19 +512,34 @@ function renderExpenses(){
 
     const hdrRow = document.createElement('div');
     hdrRow.className='ihr';
-    hdrRow.innerHTML='<span>Concepto</span><span style="text-align:right">Monto ($)</span><span style="text-align:center">Estado</span><span></span>';
+    hdrRow.innerHTML='<span>Concepto</span><span style="text-align:right">Monto ($)</span><span>Freq</span><span style="text-align:center">Estado</span><span></span>';
     body.appendChild(hdrRow);
 
     items.forEach((item,idx)=>{
       const row = document.createElement('div');
-      row.className='ir';
+      row.className='ir-wrap';
+      const showHint = item.freq && item.freq!=='mensual';
+      const monthly = monthlyAmt(item);
       row.innerHTML=`
-        <input type="text" value="${(item.n||'').replace(/"/g,'&quot;')}" placeholder="Concepto" onchange="updName('${cat.key}',${idx},this.value)">
-        <input type="number" value="${item.a||''}" placeholder="0" oninput="updAmt('${cat.key}',${idx},this.value)">
-        <button class="pbtn ${item.paid?'paid':'pend'}" onclick="togglePaid('${cat.key}',${idx})">
-          ${item.paid?'OK Pagado':'Pendiente'}
-        </button>
-        <button class="bdel" onclick="delItem('${cat.key}',${idx})" title="Eliminar">x</button>`;
+        <div class="ir">
+          <input type="text" value="${(item.n||'').replace(/"/g,'&quot;')}" placeholder="Concepto" onchange="updName('${cat.key}',${idx},this.value)">
+          <div class="amt-group">
+            <input type="number" value="${item.a||''}" placeholder="0" oninput="updAmt('${cat.key}',${idx},this.value)">
+            ${showHint?`<span class="monthly-hint">~ ${fp(monthly)}/mes</span>`:''}
+          </div>
+          <select class="freq-sel" onchange="updFreq('${cat.key}',${idx},this.value)">
+            <option value="mensual"${!item.freq||item.freq==='mensual'?' selected':''}>Mens.</option>
+            <option value="semanal"${item.freq==='semanal'?' selected':''}>Sem.</option>
+            <option value="anual"${item.freq==='anual'?' selected':''}>Anual</option>
+          </select>
+          <button class="pbtn ${item.paid?'paid':'pend'}" onclick="togglePaid('${cat.key}',${idx})">
+            ${item.paid?'OK Pagado':'Pendiente'}
+          </button>
+          <button class="bdel" onclick="delItem('${cat.key}',${idx})" title="Eliminar">x</button>
+        </div>
+        <div class="ir-det">
+          <input type="text" class="det-input" value="${(item.detalle||'').replace(/"/g,'&quot;')}" placeholder="Detalle: NIC, patente, nota..." onchange="updDetalle('${cat.key}',${idx},this.value)">
+        </div>`;
       body.appendChild(row);
     });
 
@@ -667,6 +694,15 @@ function addItem(cat){
 }
 function delItem(cat,idx){
   curData[cat].splice(idx,1);
+  renderExpenses(); renderStats(); renderChart();
+  scheduleWrite();
+}
+function updDetalle(cat,idx,val){
+  curData[cat][idx].detalle=val;
+  scheduleWrite();
+}
+function updFreq(cat,idx,val){
+  curData[cat][idx].freq=val;
   renderExpenses(); renderStats(); renderChart();
   scheduleWrite();
 }
