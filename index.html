@@ -113,7 +113,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
 .badd:hover{border-color:var(--blue);color:var(--blue);background:rgba(59,158,255,.05)}
 /* RIGHT CARDS */
 .rc{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;border:1px solid var(--border);box-shadow:var(--sh)}
-.rc h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px}
+.rc h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10py}
 .crow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04)}
 .crow:last-child{border-bottom:none}
 .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700}
@@ -138,6 +138,26 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
 .cup-total{font-size:11px;color:var(--purple);font-weight:700;margin-left:2px}
 .cuotas-toggle{font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:0 3px;text-decoration:underline;flex-shrink:0}
 .cuotas-toggle:hover{color:var(--purple)}
+/* SUSCRIPCIONES CARD */
+.sub-grupo{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:10px 0 4px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.04)}
+.sub-grupo:first-child{margin-top:0}
+.srow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.srow:last-child{border-bottom:none}
+.srow-icon{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.srow-info{flex:1;min-width:0}
+.srow-name{font-size:12px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.srow-cat{font-size:10px;color:var(--muted)}
+.srow-right{text-align:right;flex-shrink:0}
+.srow-price{font-size:12px;font-weight:700;color:var(--text)}
+.srow-anual{font-size:10px;color:var(--muted)}
+.sbadge-up{font-size:9px;font-weight:700;background:rgba(255,68,96,.12);color:var(--red);border-radius:3px;padding:1px 5px}
+.sbadge-dn{font-size:9px;font-weight:700;background:rgba(0,229,124,.12);color:var(--green);border-radius:3px;padding:1px 5px}
+.sub-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.sub-sum-item{background:var(--card2);border-radius:7px;padding:7px 9px}
+.sub-sum-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2py}
+.sub-sum-val{font-size:13px;font-weight:800}
+.tipo-sel{font-size:11px;border:1px solid var(--border);border-radius:6px;padding:3px 4px;background:var(--card2);color:var(--muted2);cursor:pointer;outline:none}
+.tipo-sel:focus{border-color:var(--purple)}
 /* FOOTER */
 .footer{background:var(--card);border-top:1px solid var(--border);padding:10px 24px;display:flex;gap:8px;align-items:center}
 .ba{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;cursor:pointer;font-size:12px;color:var(--text);font-weight:500}
@@ -241,8 +261,47 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
       <div id="insightsCont"><div style="color:var(--muted);font-size:12px;text-align:center;padding:8px">Cargando...</div></div>
     </div>
     <div class="rc">
-      <h4>Suscripciones detectadas</h4>
+      <h4>Suscripciones</h4>
       <div id="subsCont"><div style="color:var(--muted);font-size:12px;text-align:center;padding:8px">Cargando...</div></div>
+    </div>
+    <div class="rc">
+      <h4>Calculador de cuotas</h4>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;font-weight:700;letter-spacing:.3px">Precio del producto</div>
+          <input type="number" id="cPrecio" placeholder="ej: 500000" oninput="calcCuotas()" style="font-size:13px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;width:100%;background:var(--card2);color:var(--text);outline:none">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;font-weight:700;letter-spacing:.3px">Cuotas</div>
+            <input type="number" id="cCuotas" value="12" min="1" max="72" oninput="calcCuotas()" style="font-size:13px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;width:100%;background:var(--card2);color:var(--text);outline:none">
+          </div>
+          <div>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;font-weight:700;letter-spacing:.3px">Interes % mensual</div>
+            <input type="number" id="cTasa" value="8" min="0" step="0.5" oninput="calcCuotas()" style="font-size:13px;border:1px solid var(--border);border-radius:6px;padding:5px 9px;width:100%;background:var(--card2);color:var(--text);outline:none">
+          </div>
+        </div>
+      </div>
+      <div id="cResult" style="margin-top:10px;display:none">
+        <div style="background:rgba(59,158,255,.07);border:1px solid rgba(59,158,255,.15);border-radius:8px;padding:10px;text-align:center;margin-bottom:8px">
+          <div style="font-size:22px;font-weight:800;color:var(--blue)" id="cCuotaVal">-</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px">cuota mensual</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="background:var(--card2);border-radius:7px;padding:8px">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Total a pagar</div>
+            <div style="font-size:13px;font-weight:800;color:var(--amber)" id="cTotal">-</div>
+          </div>
+          <div style="background:var(--card2);border-radius:7px;padding:8px">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Interes total</div>
+            <div style="font-size:13px;font-weight:800;color:var(--red)" id="cInteres">-</div>
+          </div>
+          <div style="background:var(--card2);border-radius:7px;padding:8px;grid-column:1/-1">
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px">Pagas de mas vs contado</div>
+            <div style="font-size:13px;font-weight:800;color:var(--red)" id="cPct">-</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="rc">
       <h4>vs. Mes anterior</h4>
@@ -286,8 +345,9 @@ const CATS = [
   {key:'seguros',   name:'Seguros',              color:'#f59e0b'},
   {key:'personal',  name:'Personal domestico',   color:'#6b7280'},
   {key:'educacion', name:'Educacion',            color:'#84cc16'},
-  {key:'cuotas',    name:'Planes / Cuotas',      color:'#f97316'},
-  {key:'impuestos', name:'Impuestos',            color:'#ef4444'},
+  {key:'cuotas',         name:'Planes / Cuotas',      color:'#f97316'},
+  {key:'impuestos',      name:'Impuestos',            color:'#ef4444'},
+  {key:'suscripciones',  name:'Suscripciones',        color:'#a855f7'},
 ];
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
@@ -453,7 +513,8 @@ function prepData(key, raw){
       detalle: it.detalle||'',
       freq: it.freq||'mensual',
       cuotas: parseInt(it.cuotas)||1,
-      interes: parseFloat(it.interes)||0
+      interes: parseFloat(it.interes)||0,
+      tipo: it.tipo||'otro'
     }));
   });
   return out;
@@ -604,6 +665,7 @@ function renderExpenses(){
         </div>
         <div class="ir-det" style="display:flex;align-items:center;gap:6px">
           <input type="text" class="det-input" style="flex:1" value="${(item.detalle||'').replace(/"/g,'&quot;')}" placeholder="Detalle: NIC, patente, nota..." onchange="updDetalle('${cat.key}',${idx},this.value)">
+          ${cat.key==='suscripciones'?`<select class="tipo-sel" onchange="updTipo('${cat.key}',${idx},this.value)"><option value="streaming"${item.tipo==='streaming'?' selected':''}>Streaming</option><option value="musica"${item.tipo==='musica'?' selected':''}>Musica</option><option value="fitness"${item.tipo==='fitness'?' selected':''}>Fitness</option><option value="productividad"${item.tipo==='productividad'?' selected':''}>Productividad</option><option value="otro"${(!item.tipo||item.tipo==='otro')?' selected':''}>Otro</option></select>`:''}
           <button class="cuotas-toggle" onclick="toggleCuotas('${cat.key}',${idx})">${item.cuotas>1?item.cuotas+'c &bull;':'+ cuotas'}</button>
         </div>
         <div class="ir-cuotas${item.cuotas>1?' open':''}" id="cp_${cat.key}_${idx}">
@@ -738,7 +800,7 @@ function renderChart(){
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
       plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+fp(ctx.parsed.x)}}},
       scales:{
-        x:{stacked:true, grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:'#7a90a8',callback:v=>v===0?'0':'$'+Math.round(v/1000)+'k', font:{size:10}}},
+        x:{stacked:true, grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:#7a90a8',callback:v=>v===0?'0':'$'+Math.round(v/1000)+'k', font:{size:10}}},
         y:{stacked:true, grid:{display:false}, ticks:{color:'#7a90a8',font:{size:10}}}
       }
     }
@@ -750,6 +812,7 @@ function getAvg3M(){
   const totals=[];
   let y=cy,m=cm;
   for(let i=0;i<8&&totals.length<3;i++){
+
     m--;if(m<0){m=11;y--;}
     const key=mk(y,m);
     if(PRELOADED[key]){const t=grandTotal(prepData(key,PRELOADED[key]));if(t>0)totals.push(t);}
@@ -791,28 +854,62 @@ function renderInsights(){
 function renderSubs(){
   if(!curData) return;
   const cont=document.getElementById('subsCont');
-  const subs=[];
-  CATS.forEach(cat=>{
-    (curData[cat.key]||[]).forEach(item=>{
-      if((!item.freq||item.freq==='mensual')&&item.a>0) subs.push({cat,item,monthly:item.a});
+  const items=curData['suscripciones']]||[];
+  if(!items.length){
+    cont.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Agrega tus suscripciones<br><small style="font-size:10px">Netflix, Spotify, gimnasio, etc.</small></div>';
+    return;
+  }
+  const TIPOS={streaming:'Streaming',musica:'Musica',fitness:'Fitness',productividad:'Productividad',otro:'Otro'};
+  const TIPO_ORDER=['streaming',musica','fitness','productividad','otro'];
+  const grouped={};
+  TIPO_ORDER.forEach(t=>{grouped[t]=[];});
+  items.forEach(item=>{
+    if(item.a>0){
+      const t=item.tipo&&grouped[item.tipo]!==undefined?item.tipo:'otro';
+      grouped[t].push(item);
+    }
+  });
+  const prevItems=prevData?prevData['suscripciones']]||[]:[];
+  const getPrevAmt=n=>{ const p=prevItems.find(x=>x.n&&n&&x.n.trim().toLowerCase()===n.trim().toLowerCase()); return p?p.a:null; };
+  const initial=n=>(n||'?').trim().charAt(0).toUpperCase();
+  const hueFor=n=>{ let h=0; for(let i=0;i<(n||'').length;i++) h=(h*31+n.charCodeAt(i))%360; return h; };
+  let html='';
+  let totalMes=0, totalAnual=0;
+  TIPO_ORDER.forEach(t=>{
+    const list=grouped[t];
+    if(!list.length) return;
+    html+=`<div class="sub-grupo">${TIPOS[t]}</div>`;
+    list.forEach(item=>{
+      const prev=getPrevAmt(item.n);
+      let badge='';
+      if(prev!==null&&prev>0&&item.a>0){
+        const pct=Math.round((item.a-prev)/prev*100);
+        if(pct>0) badge=`<span class="sbadge-up">+${pct}%</span>`;
+        else if(pct<0) badge=`<span class="sbadge-dn">${pct}%</span>`;
+      }
+      const h=hueFor(item.n);
+      const bg=`hsl(${h},55%,3�%)`;
+      totalMes+=item.a;
+      totalAnual+=item.a*12;
+      html+=`<div class="srow">
+        <div class="srow-icon" style="background:${bg}">${initial(item.n)}</div>
+        <div class="srow-info">
+          <div class="srow-name">${item.n||'Sin nombre'} ${badge}</div>
+          <div class="srow-cat">${fp(Math.round(item.a/30))}/dia</div>
+        </div>
+        <div class="srow-right">
+          <div class="srow-price">${fp(item.a)}/m</div>
+          <div class="srow-anual">${fp(item.a*12)}/ano</div>
+        </div>
+      </div>`;
     });
   });
-  subs.sort((a,b)=>b.monthly-a.monthly);
-  const totalAnual=subs.reduce((s,x)=>s+x.monthly*12,0);
-  let html='';
-  subs.slice(0,6).forEach(s=>{
-    const cuotasBadge=s.item.cuotas>1?`<span class="cuotas-pill">${s.item.cuotas}c</span>`:'';
-    html+=`<div class="sub-item">
-      <span style="display:flex;align-items:center;gap:5px;overflow:hidden">
-        <span style="width:6px;height:6px;border-radius:50%;background:${s.cat.color};flex-shrink:0;display:inline-block"></span>
-        <span style="color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.item.n||'Sin nombre'}</span>${cuotasBadge}
-      </span>
-      <span style="font-weight:700;color:var(--text);flex-shrink:0;margin-left:6px">${fp(s.monthly)}/m</span>
-    </div>`;
-  });
-  if(subs.length>6) html+=`<div style="font-size:10px;color:var(--muted);text-align:center;padding:3px">+ ${subs.length-6} mas...</div>`;
-  if(subs.length>0) html+=`<div class="sub-total-row"><span style="color:var(--muted2)">${subs.length} items &bull; total anual</span><strong style="color:var(--green)">${fp(totalAnual)}</strong></div>`;
-  cont.innerHTML=html||'<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px">Sin suscripciones mensuales</div>';
+  html+=`<div class="sub-summary">
+    <div class="sub-sum-item"><div class="sub-sum-lbl">Mensual</div><div class="sub-sum-val" style="color:var(--purple)">${fp(totalMes)}</div></div>
+    <div class="sub-sum-item"><div class="sub-sum-lbl">Anual</div><div class="sub-sum-val" style="color:var(--amber)">${fp(totalAnual)}</div></div>
+    <div class="sub-sum-item"><div class="sub-sum-lbl">Por dia</div><div class="sub-sum-val" style="color:var(--muted2)">${fp(Math.round(totalMes/30))}</div></div>
+  </div>`;
+  cont.innerHTML=html;
 }
 
 // -- RENDER ALL ----------------------------------------------------------------
@@ -847,7 +944,7 @@ function togglePaid(cat,idx){
   scheduleWrite();
 }
 function addItem(cat){
-  curData[cat].push({n:'',a:0,paid:false,detalle:'',freq:'mensual',cuotas:1,interes:0});
+  curData[cat].push({n;'',a:0,paid:false,detalle:'',freq:'mensual',cuotas:1,interes:0,tipo:'otro'});
   renderExpenses(); renderStats(); renderChart();
   scheduleWrite();
 }
@@ -877,6 +974,28 @@ function updInteres(cat,idx,val){
   curData[cat][idx].interes=parseFloat(val)||0;
   renderExpenses(); scheduleWrite();
 }
+function updTipo(cat,idx,val){
+  curData[cat][idx].tipo=val;
+  renderSubs(); scheduleWrite();
+}
+
+// -- CALCULADOR CUOTAS ---------------------------------------------------------
+function calcCuotas(){
+  const P=parseFloat(document.getElementById('cPrecio').value)||0;
+  const n=parseInt(document.getElementById('cCuotas').value)||1;
+  const r=parseFloat(document.getElementById('cTasa').value)/100||0;
+  const res=document.getElementById('cResult');
+  if(!P){res.style.display='none';return;}
+  res.style.display='block';
+  const cuota=r===0?P/n:P*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  const total=cuota*n;
+  const interes=total-P;
+  const pct=Math.round(interes/P*100);
+  document.getElementById('cCuotaVal').textContent=fp(cuota);
+  document.getElementById('cTotal').textContent=fp(total);
+  document.getElementById('cInteres').textContent=fp(interes);
+  document.getElementById('cPct').textContent=pct+'% mas que al contado';
+}
 
 // -- NAVIGATION ----------------------------------------------------------------
 function changeMonth(dir){
@@ -899,7 +1018,7 @@ async function fetchRates(){
     const b=f('blue'),o=f('oficial'),m=f('bolsa')||f('mep');
     if(b) document.getElementById('rBlue').value=b.venta;
     if(o) document.getElementById('rOficial').value=o.venta;
-    if(m) document.getElementById('rMep').value=m.venta;
+    if(m) document.getElementById('rmep').value=m.venta;
     document.getElementById('lastUpdate').textContent='Actualizado '+new Date().toLocaleTimeString('es-AR');
     onRateChange();
   }catch(e){
@@ -907,7 +1026,8 @@ async function fetchRates(){
   }
 }
 
-// -- EXPORT / IMPORT -----------------------------------------------------------
+// -- EXPORT 
+IMPORT -----------------------------------------------------------
 function exportData(){
   db.ref('gastos').once('value').then(snap=>{
     const data = snap.val()||{};
