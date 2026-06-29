@@ -113,7 +113,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
 .badd:hover{border-color:var(--blue);color:var(--blue);background:rgba(59,158,255,.05)}
 /* RIGHT CARDS */
 .rc{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;border:1px solid var(--border);box-shadow:var(--sh)}
-.rc h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10py}
+.rc h4{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px}
 .crow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px;border-bottom:1px solid rgba(255,255,255,.04)}
 .crow:last-child{border-bottom:none}
 .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700}
@@ -154,7 +154,7 @@ body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;background:var(--bg);
 .sbadge-dn{font-size:9px;font-weight:700;background:rgba(0,229,124,.12);color:var(--green);border-radius:3px;padding:1px 5px}
 .sub-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
 .sub-sum-item{background:var(--card2);border-radius:7px;padding:7px 9px}
-.sub-sum-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2py}
+.sub-sum-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
 .sub-sum-val{font-size:13px;font-weight:800}
 .tipo-sel{font-size:11px;border:1px solid var(--border);border-radius:6px;padding:3px 4px;background:var(--card2);color:var(--muted2);cursor:pointer;outline:none}
 .tipo-sel:focus{border-color:var(--purple)}
@@ -800,7 +800,7 @@ function renderChart(){
       indexAxis:'y', responsive:true, maintainAspectRatio:false,
       plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+fp(ctx.parsed.x)}}},
       scales:{
-        x:{stacked:true, grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:#7a90a8',callback:v=>v===0?'0':'$'+Math.round(v/1000)+'k', font:{size:10}}},
+        x:{stacked:true, grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:'#7a90a8',callback:v=>v===0?'0':'$'+Math.round(v/1000)+'k', font:{size:10}}},
         y:{stacked:true, grid:{display:false}, ticks:{color:'#7a90a8',font:{size:10}}}
       }
     }
@@ -812,7 +812,6 @@ function getAvg3M(){
   const totals=[];
   let y=cy,m=cm;
   for(let i=0;i<8&&totals.length<3;i++){
-
     m--;if(m<0){m=11;y--;}
     const key=mk(y,m);
     if(PRELOADED[key]){const t=grandTotal(prepData(key,PRELOADED[key]));if(t>0)totals.push(t);}
@@ -854,13 +853,13 @@ function renderInsights(){
 function renderSubs(){
   if(!curData) return;
   const cont=document.getElementById('subsCont');
-  const items=curData['suscripciones']]||[];
+  const items=curData['suscripciones']||[];
   if(!items.length){
     cont.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Agrega tus suscripciones<br><small style="font-size:10px">Netflix, Spotify, gimnasio, etc.</small></div>';
     return;
   }
   const TIPOS={streaming:'Streaming',musica:'Musica',fitness:'Fitness',productividad:'Productividad',otro:'Otro'};
-  const TIPO_ORDER=['streaming',musica','fitness','productividad','otro'];
+  const TIPO_ORDER=['streaming','musica','fitness','productividad','otro'];
   const grouped={};
   TIPO_ORDER.forEach(t=>{grouped[t]=[];});
   items.forEach(item=>{
@@ -869,7 +868,7 @@ function renderSubs(){
       grouped[t].push(item);
     }
   });
-  const prevItems=prevData?prevData['suscripciones']]||[]:[];
+  const prevItems=prevData?prevData['suscripciones']||[]:[];
   const getPrevAmt=n=>{ const p=prevItems.find(x=>x.n&&n&&x.n.trim().toLowerCase()===n.trim().toLowerCase()); return p?p.a:null; };
   const initial=n=>(n||'?').trim().charAt(0).toUpperCase();
   const hueFor=n=>{ let h=0; for(let i=0;i<(n||'').length;i++) h=(h*31+n.charCodeAt(i))%360; return h; };
@@ -888,7 +887,7 @@ function renderSubs(){
         else if(pct<0) badge=`<span class="sbadge-dn">${pct}%</span>`;
       }
       const h=hueFor(item.n);
-      const bg=`hsl(${h},55%,3�%)`;
+      const bg=`hsl(${h},55%,38%)`;
       totalMes+=item.a;
       totalAnual+=item.a*12;
       html+=`<div class="srow">
@@ -944,7 +943,7 @@ function togglePaid(cat,idx){
   scheduleWrite();
 }
 function addItem(cat){
-  curData[cat].push({n;'',a:0,paid:false,detalle:'',freq:'mensual',cuotas:1,interes:0,tipo:'otro'});
+  curData[cat].push({n:'',a:0,paid:false,detalle:'',freq:'mensual',cuotas:1,interes:0,tipo:'otro'});
   renderExpenses(); renderStats(); renderChart();
   scheduleWrite();
 }
@@ -1018,7 +1017,7 @@ async function fetchRates(){
     const b=f('blue'),o=f('oficial'),m=f('bolsa')||f('mep');
     if(b) document.getElementById('rBlue').value=b.venta;
     if(o) document.getElementById('rOficial').value=o.venta;
-    if(m) document.getElementById('rmep').value=m.venta;
+    if(m) document.getElementById('rMep').value=m.venta;
     document.getElementById('lastUpdate').textContent='Actualizado '+new Date().toLocaleTimeString('es-AR');
     onRateChange();
   }catch(e){
@@ -1026,8 +1025,7 @@ async function fetchRates(){
   }
 }
 
-// -- EXPORT 
-IMPORT -----------------------------------------------------------
+// -- EXPORT / IMPORT -----------------------------------------------------------
 function exportData(){
   db.ref('gastos').once('value').then(snap=>{
     const data = snap.val()||{};
